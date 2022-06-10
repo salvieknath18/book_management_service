@@ -11,12 +11,12 @@ from errors import SchemaValidationError, UserAlreadyExistsError, InternalServer
 
 class UsersApi(Resource):
 
-    @staticmethod
-    def get():
+    @jwt_required()
+    def get(self):
         users = User.objects().to_json()
         return Response(users, mimetype="application/json", status=200)
 
-    @jwt_required
+    @jwt_required()
     def post(self):
         try:
             body = request.get_json()
@@ -32,11 +32,10 @@ class UsersApi(Resource):
 
 
 class UserApi(Resource):
-    @jwt_required
+
+    @jwt_required()
     def put(self, user_id):
         try:
-            # doc_id = get_jwt_identity()
-            # user = User.objects().get(id=doc_id)
             body = request.get_json()
             User.objects.get(id=user_id).update(**body)
             return '', 200
@@ -47,10 +46,9 @@ class UserApi(Resource):
         except Exception:
             raise InternalServerError
 
-    @jwt_required
+    @jwt_required()
     def delete(self, user_id):
         try:
-            # doc_id = get_jwt_identity()
             user = User.objects().get(id=user_id)
             user.delete()
             return '', 200
@@ -59,8 +57,8 @@ class UserApi(Resource):
         except Exception:
             raise DeletingUserError
 
-    @staticmethod
-    def get(user_id):
+    @jwt_required()
+    def get(self, user_id):
         try:
             users = User.objects().get(user_id=user_id).to_json()
             return Response(users, mimetype="application/json", status=200)

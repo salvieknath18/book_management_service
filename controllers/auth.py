@@ -5,16 +5,14 @@ from models.user import User
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token
 from mongoengine.errors import FieldDoesNotExist, DoesNotExist, NotUniqueError
-from flask_jwt_extended import jwt_required
 
 from services.user import add_user
 from errors import SchemaValidationError, InternalServerError, UnauthorizedError, EmailAlreadyExistsError
 
 
 class RegisterApi(Resource):
-
-    @jwt_required
-    def post(self):
+    @staticmethod
+    def post():
         try:
             body = request.get_json()
             user = User(**body)
@@ -24,13 +22,13 @@ class RegisterApi(Resource):
             raise SchemaValidationError
         except NotUniqueError:
             raise EmailAlreadyExistsError
-        except Exception as e:
+        except Exception:
             raise InternalServerError
 
 
 class LoginApi(Resource):
-
-    def post(self):
+    @staticmethod
+    def post():
         try:
             body = request.get_json()
             user = User.objects().get(email=body.get('email'))

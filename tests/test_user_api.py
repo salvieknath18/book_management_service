@@ -53,7 +53,8 @@ class UserTest(unittest.TestCase):
         payload = json.dumps(dummy_user)
 
         # When
-        response = self.app.post('/api/auth/register', headers={"Content-Type": "application/json"}, data=payload)
+        response = self.app.post('/api/auth/register',
+                                 headers={"Content-Type": "application/json", "bearerToken": self.token}, data=payload)
 
         # Then
         self.assertEqual(str, type(response.json['id']))
@@ -61,10 +62,11 @@ class UserTest(unittest.TestCase):
 
     def test_user_list(self):
         # Given
-        # payload = json.dumps({'email': 'admin@gmail.com', 'password': 'admin_123'})
+        payload = json.dumps({'email': 'admin@gmail.com', 'password': 'admin_123'})
 
         # When
-        response = self.app.get('/api/users', headers={"Content-Type": "application/json"})
+        response = self.app.get('/api/users',
+                                headers={"Content-Type": "application/json", "bearer_token": self.token})
 
         # Then
         self.assertEqual(list, type(response.json))

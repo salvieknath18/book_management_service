@@ -8,12 +8,12 @@ admin_user = {
         }
 
 dummy_user = {
-    'user_id': '987',
-    'name': 'dummy',
-    'email': 'dummy@gmail.com',
-    'password': 'dummy_987',
-    'role': 'member',
-    'books': []
+    "user_id": "987",
+    "name": "dummy",
+    "email": "dummy@gmail.com",
+    "password": "dummy_987",
+    "role": "member",
+    "books": []
 }
 
 list_users = [
@@ -29,13 +29,13 @@ list_users = [
         "email": "dummy2@gmail.com",
         "password": "dummy2_123",
         "role": "editor",
-        "books": ['B009']
+        "books": ["B009"]
     },
     {
         "name": "dummy3",
         "email": "dummy3@gmail.com",
         "password": "dummy3_123",
         "role": "admin",
-        "books": ['B012', 'B016']
+        "books": ["B012", "B016"]
     }
 ]
