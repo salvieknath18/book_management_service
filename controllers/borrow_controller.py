@@ -5,12 +5,13 @@ from services.user_service import get_current_user, get_user
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import DoesNotExist
-
+from services.user_service import roles_required
 from errors import InternalServerError, DeletingBookError, BookNotExistsError
 
 
 class BorrowEntries(Resource):
     @jwt_required()
+    @roles_required('admin', 'editor')
     def get(self):
         books = get_all_entries()
         return Response(books, mimetype="application/json", status=200)
@@ -18,6 +19,7 @@ class BorrowEntries(Resource):
 
 class BookEntry(Resource):
     @jwt_required()
+    @roles_required('admin', 'editor')
     def delete(self, obj_id):
         try:
             delete_entry(obj_id)
@@ -28,6 +30,7 @@ class BookEntry(Resource):
             raise DeletingBookError
 
     @jwt_required()
+    @roles_required('admin', 'editor')
     def get(self, obj_id):
         try:
             book = get_entry(obj_id)
@@ -52,6 +55,7 @@ class BorrowBook(Resource):
 class AssignBookByAdmin(Resource):
 
     @jwt_required()
+    @roles_required('admin', 'editor')
     def post(self):
         body = request.get_json()
         isbn = body['isbn']
@@ -74,6 +78,7 @@ class ReturnBook(Resource):
 class CollectBookByAdmin(Resource):
 
     @jwt_required()
+    @roles_required('admin', 'editor')
     def post(self):
         body = request.get_json()
         isbn = body['isbn']

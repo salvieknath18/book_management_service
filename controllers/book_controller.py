@@ -4,9 +4,9 @@ from services.book_service import add_book, update_book, delete_book, get_book, 
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError
-
 from errors import SchemaValidationError, BookAlreadyExistsError, InternalServerError, UpdatingBookError, \
     DeletingBookError, BookNotExistsError
+from services.user_service import roles_required
 
 
 class BooksApi(Resource):
@@ -17,6 +17,7 @@ class BooksApi(Resource):
         return Response(books, mimetype="application/json", status=200)
 
     @jwt_required()
+    @roles_required('admin', 'editor')
     def post(self):
         try:
             body = request.get_json()
@@ -42,6 +43,7 @@ class BooksApi(Resource):
 class BookApi(Resource):
 
     @jwt_required()
+    @roles_required('admin', 'editor')
     def put(self, obj_id):
         try:
             body = request.get_json()
@@ -64,6 +66,7 @@ class BookApi(Resource):
             raise InternalServerError
 
     @jwt_required()
+    @roles_required('admin', 'editor')
     def delete(self, obj_id):
         try:
             delete_book(obj_id)

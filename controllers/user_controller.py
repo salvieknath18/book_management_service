@@ -5,16 +5,19 @@ from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, 
 from services.user_service import add_user, update_user, delete_user, get_user, get_all_users
 from errors import SchemaValidationError, UserAlreadyExistsError, InternalServerError, UpdatingUserError, \
     DeletingUserError, UserNotExistsError
+from services.user_service import roles_required
 
 
 class UsersApi(Resource):
 
     @jwt_required()
+    @roles_required('admin')
     def get(self):
         users = get_all_users()
         return Response(users, mimetype="application/json", status=200)
 
     @jwt_required()
+    @roles_required('admin')
     def post(self):
         try:
             body = request.get_json()
@@ -36,6 +39,7 @@ class UsersApi(Resource):
 class UserApi(Resource):
 
     @jwt_required()
+    @roles_required('admin')
     def put(self, obj_id):
         try:
             body = request.get_json()
@@ -53,6 +57,7 @@ class UserApi(Resource):
             raise InternalServerError
 
     @jwt_required()
+    @roles_required('admin')
     def delete(self, obj_id):
         try:
             delete_user(obj_id)
@@ -63,6 +68,7 @@ class UserApi(Resource):
             raise DeletingUserError
 
     @jwt_required()
+    @roles_required('admin')
     def get(self, obj_id):
         try:
             user = get_user(obj_id)
