@@ -2,7 +2,7 @@ from flask import request, Response
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError
-from services.user import add_user, update_user, delete_user, get_user, get_all_users
+from services.user_service import add_user, update_user, delete_user, get_user, get_all_users
 from errors import SchemaValidationError, UserAlreadyExistsError, InternalServerError, UpdatingUserError, \
     DeletingUserError, UserNotExistsError
 

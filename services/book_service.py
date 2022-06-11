@@ -25,9 +25,7 @@ def get_all_books():
     return Book.objects().to_json()
 
 
-def add_book_copy(obj_id):
-    pass
+def get_book_by_genre(genre):
+    books = Book.objects.get(genre=genre)
+    return books
 
-
-def remove_book_copy(obj_id, copy_id):
-    pass

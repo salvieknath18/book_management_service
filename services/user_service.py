@@ -1,4 +1,5 @@
 from models.user import User
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 
 def add_user(user_data):
@@ -31,3 +32,9 @@ def get_user(obj_id):
 
 def get_all_users():
     return User.objects().to_json()
+
+
+def get_current_user():
+    user_id = get_jwt_identity()
+    current_user = User.objects().get(id=user_id)
+    return current_user

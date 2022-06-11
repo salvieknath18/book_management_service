@@ -6,11 +6,12 @@ from flask_restful import Resource
 from flask_jwt_extended import create_access_token
 from mongoengine.errors import FieldDoesNotExist, DoesNotExist, NotUniqueError
 
-from services.user import add_user
+from services.user_service import add_user
 from errors import SchemaValidationError, InternalServerError, UnauthorizedError, EmailAlreadyExistsError
 
 
 class RegisterApi(Resource):
+
     @staticmethod
     def post():
         try:
