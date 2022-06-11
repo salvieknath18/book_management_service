@@ -2,9 +2,7 @@ from flask import request, Response
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError
-
-from models.user import User
-from services.user import add_user
+from services.user import add_user, update_user, delete_user, get_user, get_all_users
 from errors import SchemaValidationError, UserAlreadyExistsError, InternalServerError, UpdatingUserError, \
     DeletingUserError, UserNotExistsError
 
@@ -13,16 +11,20 @@ class UsersApi(Resource):
 
     @jwt_required()
     def get(self):
-        users = User.objects().to_json()
+        users = get_all_users()
         return Response(users, mimetype="application/json", status=200)
 
     @jwt_required()
     def post(self):
         try:
             body = request.get_json()
-            user = User(**body)
-            user_id = add_user(user)
-            return {'user_id': str(user_id)}, 200
+            user_data = dict()
+            user_data['email'] = body['email']
+            user_data['password'] = body['password']
+            user_data['name'] = body['name']
+            user_data['role'] = body['role']
+            obj_id = add_user(user_data)
+            return {'success': f"Created book with id {obj_id}"}, 200
         except (FieldDoesNotExist, ValidationError):
             raise SchemaValidationError
         except NotUniqueError:
@@ -34,11 +36,15 @@ class UsersApi(Resource):
 class UserApi(Resource):
 
     @jwt_required()
-    def put(self, user_id):
+    def put(self, obj_id):
         try:
             body = request.get_json()
-            User.objects.get(id=user_id).update(**body)
-            return '', 200
+            user_data = dict()
+            user_data['email'] = body['email']
+            user_data['name'] = body['name']
+            user_data['role'] = body['role']
+            updated_data = update_user(obj_id, user_data)
+            return updated_data, 200
         except InvalidQueryError:
             raise SchemaValidationError
         except DoesNotExist:
@@ -47,21 +53,20 @@ class UserApi(Resource):
             raise InternalServerError
 
     @jwt_required()
-    def delete(self, user_id):
+    def delete(self, obj_id):
         try:
-            user = User.objects().get(id=user_id)
-            user.delete()
-            return '', 200
+            delete_user(obj_id)
+            return 'success', 200
         except DoesNotExist:
             raise UserNotExistsError
         except Exception:
             raise DeletingUserError
 
     @jwt_required()
-    def get(self, user_id):
+    def get(self, obj_id):
         try:
-            users = User.objects().get(user_id=user_id).to_json()
-            return Response(users, mimetype="application/json", status=200)
+            user = get_user(obj_id)
+            return Response(user, mimetype="application/json", status=200)
         except DoesNotExist:
             raise UserNotExistsError
         except Exception:

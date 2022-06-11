@@ -16,8 +16,8 @@ class RegisterApi(Resource):
         try:
             body = request.get_json()
             user = User(**body)
-            user_id = add_user(user)
-            return {'user_id': str(user_id)}, 200
+            obj_id = add_user(user)
+            return {'obj_id': str(obj_id)}, 200
         except FieldDoesNotExist:
             raise SchemaValidationError
         except NotUniqueError:
@@ -27,6 +27,7 @@ class RegisterApi(Resource):
 
 
 class LoginApi(Resource):
+
     @staticmethod
     def post():
         try:

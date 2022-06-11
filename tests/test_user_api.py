@@ -2,7 +2,7 @@ import unittest
 import json
 
 from app import app
-from models.db import db
+from db import db
 from tests.test_data import *
 from errors import UnauthorizedError
 
@@ -53,11 +53,10 @@ class UserTest(unittest.TestCase):
         payload = json.dumps(dummy_user)
 
         # When
-        response = self.app.post('/api/auth/register',
-                                 headers={"Content-Type": "application/json", "bearerToken": self.token}, data=payload)
+        response = self.app.post('/api/users', headers={"Content-Type": "application/json", "Authorization": f"Bearer { self.token }"}, data=payload)
 
         # Then
-        self.assertEqual(str, type(response.json['id']))
+        self.assertEqual(str, type(response.json.get("success")))
         self.assertEqual(200, response.status_code)
 
     def test_user_list(self):
@@ -65,8 +64,7 @@ class UserTest(unittest.TestCase):
         payload = json.dumps({'email': 'admin@gmail.com', 'password': 'admin_123'})
 
         # When
-        response = self.app.get('/api/users',
-                                headers={"Content-Type": "application/json", "bearer_token": self.token})
+        response = self.app.get('/api/users', headers={"Content-Type": "application/json", "Authorization": f"Bearer { self.token }"})
 
         # Then
         self.assertEqual(list, type(response.json))
