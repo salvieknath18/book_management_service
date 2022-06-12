@@ -1,6 +1,8 @@
 import datetime
 
 from models.borrow import Borrow
+from errors import InternalServerError
+from services.book_service import increment_copy_count, decrement_copy_count
 
 
 def map_borrow_data_with_borrow_model(isbn, user=None,
@@ -18,12 +20,13 @@ def map_borrow_data_with_borrow_model(isbn, user=None,
 def add_entry(entry_data):
     entry = Borrow(**entry_data)
     entry.save()
-    return entry.id
+    return entry
 
 
 def update_entry(obj_id, entry_data):
     Borrow.objects.get(id=obj_id).update(**entry_data)
-    return Borrow.objects.get(id=obj_id).to_json()
+    entry = Borrow.objects.get(id=obj_id)
+    return entry
 
 
 def delete_entry(obj_id):
@@ -42,12 +45,18 @@ def get_all_entries():
 def borrow_book_copy(isbn, user):
     # create new entry in borrow collection
     borrow_model_data = map_borrow_data_with_borrow_model(isbn, user=user)
-    add_entry(borrow_model_data)
+    try:
+        add_entry(borrow_model_data)
+    except Exception:
+        raise InternalServerError("unable to update the entry")
+    else:
+        decrement_copy_count(isbn)
 
 
 def get_entry_id_from_isbn_snd_user(isbn, user):
     entries = Borrow.objects.get(isbn=isbn, user=user)
     valid_entry = entries[0]
+    # To-Do Validate entry to update
     return valid_entry
 
 
@@ -55,4 +64,9 @@ def remove_book_copy(isbn, user):
     # update entry in borrow collection
     borrow_model_data = map_borrow_data_with_borrow_model(isbn, user=user, return_date=datetime.datetime.now())
     entry_to_update = get_entry_id_from_isbn_snd_user(borrow_model_data['isbn'], borrow_model_data['user'])
-    entry_to_update.update(**borrow_model_data)
+    try:
+        entry_to_update.update(**borrow_model_data)
+    except Exception:
+        raise InternalServerError("unable to update the entry")
+    else:
+        increment_copy_count(isbn)
