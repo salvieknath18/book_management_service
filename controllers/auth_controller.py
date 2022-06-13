@@ -16,9 +16,13 @@ class RegisterApi(Resource):
     def post():
         try:
             body = request.get_json()
-            user = User(**body)
-            obj_id = add_user(user)
-            return {'obj_id': str(obj_id)}, 200
+            user_data = dict()
+            user_data['email'] = body['email']
+            user_data['password'] = body['password']
+            user_data['name'] = body['name']
+            user_data['role'] = body['role']
+            obj_id = add_user(user_data)
+            return {'success': f"Created book with id {obj_id}"}, 200
         except FieldDoesNotExist:
             raise SchemaValidationError
         except NotUniqueError:

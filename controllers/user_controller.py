@@ -2,10 +2,12 @@ from flask import request, Response
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError
-from services.user_service import add_user, update_user, delete_user, get_user, get_all_users
+from services.user_service import add_user, update_user, delete_user, get_user, get_all_users, \
+    clean_all_users, clean_user
 from errors import SchemaValidationError, UserAlreadyExistsError, InternalServerError, UpdatingUserError, \
     DeletingUserError, UserNotExistsError
 from services.user_service import roles_required
+import json
 
 
 class UsersApi(Resource):
@@ -14,7 +16,8 @@ class UsersApi(Resource):
     @roles_required('admin')
     def get(self):
         users = get_all_users()
-        return Response(users, mimetype="application/json", status=200)
+        users_data = clean_all_users(users)
+        return Response(json.dumps(users_data), mimetype="application/json", status=200)
 
     @jwt_required()
     @roles_required('admin')
@@ -40,15 +43,16 @@ class UserApi(Resource):
 
     @jwt_required()
     @roles_required('admin')
-    def put(self, obj_id):
+    def put(self, id):
         try:
             body = request.get_json()
             user_data = dict()
             user_data['email'] = body['email']
             user_data['name'] = body['name']
             user_data['role'] = body['role']
-            updated_data = update_user(obj_id, user_data)
-            return updated_data, 200
+            updated_user = update_user(id, user_data)
+            updated_data = clean_user(updated_user)
+            return Response(json.dumps(updated_data), mimetype="application/json", status=200)
         except InvalidQueryError:
             raise SchemaValidationError
         except DoesNotExist:
@@ -58,9 +62,9 @@ class UserApi(Resource):
 
     @jwt_required()
     @roles_required('admin')
-    def delete(self, obj_id):
+    def delete(self, id):
         try:
-            delete_user(obj_id)
+            delete_user(id)
             return 'success', 200
         except DoesNotExist:
             raise UserNotExistsError
@@ -69,10 +73,10 @@ class UserApi(Resource):
 
     @jwt_required()
     @roles_required('admin')
-    def get(self, obj_id):
+    def get(self, id):
         try:
-            user = get_user(obj_id)
-            return Response(user, mimetype="application/json", status=200)
+            user = clean_user(get_user(id))
+            return Response(json.dumps(user), mimetype="application/json", status=200)
         except DoesNotExist:
             raise UserNotExistsError
         except Exception:

@@ -8,11 +8,11 @@ from controllers.analytics_controller import BooksGenre
 def initialize_routes(api):
     # Routing for books apis
     api.add_resource(BooksApi, '/api/books')
-    api.add_resource(BookApi, '/api/books/<id>')
+    api.add_resource(BookApi, '/api/book/<id>')
 
     # Routing for User apis
     api.add_resource(UsersApi, '/api/users')
-    api.add_resource(UserApi, '/api/users/<id>')
+    api.add_resource(UserApi, '/api/user/<id>')
 
     # Routing for auth apis
     api.add_resource(RegisterApi, '/api/auth/register')

@@ -1,12 +1,14 @@
-from flask import request, Response
+from flask import request, Response, jsonify
 import datetime
-from services.book_service import add_book, update_book, delete_book, get_book, get_all_books
+from services.book_service import add_book, update_book, delete_book, get_book, get_all_books, \
+    clean_all_books, clean_book
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError
 from errors import SchemaValidationError, BookAlreadyExistsError, InternalServerError, UpdatingBookError, \
     DeletingBookError, BookNotExistsError
 from services.user_service import roles_required
+import json
 
 
 class BooksApi(Resource):
@@ -14,7 +16,8 @@ class BooksApi(Resource):
     @staticmethod
     def get():
         books = get_all_books()
-        return Response(books, mimetype="application/json", status=200)
+        books_data = clean_all_books(books)
+        return Response(json.dumps(books_data), mimetype="application/json", status=200)
 
     @jwt_required()
     @roles_required('admin', 'editor')
@@ -56,8 +59,9 @@ class BookApi(Resource):
             book_data['total_count'] = body['total_count']
             book_data['available_count'] = body['available_count']
             book_data['year_published'] = datetime.datetime.strptime(body['year_published'], "%d/%m/%Y  %H:%M:%S")
-            updated_data = update_book(obj_id, book_data)
-            return updated_data, 200
+            updated_book = update_book(obj_id, book_data)
+            updated_data = clean_book(updated_book)
+            return Response(json.dumps(updated_data), mimetype="application/json", status=200)
         except InvalidQueryError:
             raise SchemaValidationError
         except DoesNotExist:
@@ -79,8 +83,8 @@ class BookApi(Resource):
     @staticmethod
     def get(obj_id):
         try:
-            book = get_book(obj_id)
-            return Response(book, mimetype="application/json", status=200)
+            book = clean_book(get_book(obj_id))
+            return Response(json.dumps(book), mimetype="application/json", status=200)
         except DoesNotExist:
             raise BookNotExistsError
         except Exception:

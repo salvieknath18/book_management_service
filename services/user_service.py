@@ -39,7 +39,7 @@ def update_user(obj_id, user_data):
     user = User.objects.get(id=obj_id)
     user_data["password"] = user.password
     user.update(**user_data)
-    return User.objects.get(id=obj_id).to_json()
+    return User.objects.get(id=obj_id)
 
 
 def delete_user(obj_id):
@@ -48,11 +48,24 @@ def delete_user(obj_id):
 
 
 def get_user(obj_id):
-    return User.objects.get(id=obj_id).to_json()
+    return User.objects.get(id=obj_id)
+
+
+def clean_user(user):
+    user_data = dict()
+    user_data["id"] = str(user.id)
+    user_data["name"] = user.name
+    user_data["email"] = user.email
+    user_data["role"] = user.role
+    return user_data
 
 
 def get_all_users():
-    return User.objects().to_json()
+    return User.objects()
+
+
+def clean_all_users(users):
+    return [clean_user(user) for user in users]
 
 
 def get_current_user():

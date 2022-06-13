@@ -35,11 +35,27 @@ def delete_entry(obj_id):
 
 
 def get_entry(obj_id):
-    return Borrow.objects.get(id=obj_id).to_json()
+    return Borrow.objects.get(id=obj_id)
+
+
+def clean_borrow_entry(borrow_entry):
+    borrow_data = dict()
+    borrow_data["id"] = str(borrow_entry.id)
+    borrow_data["isbn"] = borrow_entry.isbn
+    borrow_data["user"] = borrow_entry.user
+    borrow_data["borrow_date"] = datetime.datetime.strftime(borrow_entry.borrow_date, "%d/%m/%Y  %H:%M:%S")
+    borrow_data["return_date"] = datetime.datetime.strftime(borrow_entry.return_date, "%d/%m/%Y  %H:%M:%S")
+    borrow_data["status"] = borrow_entry.status
+    borrow_data["year_published"] = datetime.datetime.strftime(borrow_entry.borrow_date, "%d/%m/%Y")
+    return borrow_data
 
 
 def get_all_entries():
-    return Borrow.objects().to_json()
+    return Borrow.objects()
+
+
+def clean_all_entries(entries):
+    return [clean_borrow_entry(entry) for entry in entries]
 
 
 def borrow_book_copy(isbn, user):
