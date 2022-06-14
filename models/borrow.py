@@ -2,11 +2,11 @@ from db import db
 
 
 class Borrow(db.Document):
-    isbn = db.ReferenceField('Book', required=True)
+    book = db.ReferenceField('Book', required=True)
     user = db.ReferenceField('User')
     borrow_date = db.DateTimeField()
     return_date = db.DateTimeField()
-    status = db.BooleanField()
+    status = db.StringField()
 
 # TO-DO
 # if a user is deleted then the book created by the user is also deleted. ? does it make sense

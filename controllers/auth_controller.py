@@ -1,12 +1,12 @@
 import datetime
-
-from flask import request
+import json
+from flask import request, Response
 from models.user import User
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token
 from mongoengine.errors import FieldDoesNotExist, DoesNotExist, NotUniqueError
 
-from services.user_service import add_user
+from services.user_service import add_user, clean_user
 from errors import SchemaValidationError, InternalServerError, UnauthorizedError, EmailAlreadyExistsError
 
 
@@ -43,7 +43,9 @@ class LoginApi(Resource):
                 return {'error': 'Email or password invalid'}, 401
             expires = datetime.timedelta(days=7)
             access_token = create_access_token(identity=str(user.id), expires_delta=expires)
-            return {'token': access_token}, 200
+            user_data = clean_user(user)
+            user_data['token'] = access_token
+            return Response(json.dumps(user_data), mimetype="application/json", status=200)
         except (UnauthorizedError, DoesNotExist):
             raise UnauthorizedError
         except Exception:

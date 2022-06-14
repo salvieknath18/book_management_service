@@ -9,6 +9,7 @@ def add_book(book_data):
 
 
 def update_book(obj_id, book_data):
+    print(book_data)
     Book.objects.get(id=obj_id).update(**book_data)
     return Book.objects.get(id=obj_id)
 
@@ -20,6 +21,10 @@ def delete_book(obj_id):
 
 def get_book(obj_id):
     return Book.objects.get(id=obj_id)
+
+
+def get_book_by_isbn(isbn):
+    return Book.objects.get(isbn=isbn)
 
 
 def clean_book(book):
@@ -49,11 +54,11 @@ def get_book_by_genre(genre):
     return books
 
 
-def update_available_copy_count(isbn, updated_available_count):
-    book = Book.objects.get(isbn=isbn)
+def update_available_copy_count(book, updated_available_count):
     book.available_count = updated_available_count
-    # To-Do test this functionality
-    book.update()
+    book_data = clean_book(book)
+    book_data["year_published"] = datetime.datetime.strptime(book_data["year_published"], "%d/%m/%Y")
+    book.update(**book_data)
     return book
 
 
@@ -69,19 +74,19 @@ def get_total_count(isbn):
     return total_copy_count
 
 
-def increment_copy_count(isbn):
-    available_count = get_available_copy_count(isbn)
-    total_count = get_total_count(isbn)
+def increment_copy_count(book):
+    available_count = book.available_count
+    total_count = book.total_count
     if available_count >= total_count:
         raise Exception("Invalid Request to increment copy count")
     else:
-        update_available_copy_count(isbn, available_count+1)
+        update_available_copy_count(book, available_count+1)
 
 
-def decrement_copy_count(isbn):
-    available_count = get_available_copy_count(isbn)
+def decrement_copy_count(book):
+    available_count = book.available_count
     if available_count <= 0:
         raise Exception("Invalid Request to decrement copy count")
     else:
-        update_available_copy_count(isbn, available_count-1)
+        update_available_copy_count(book, available_count-1)
 

@@ -3,17 +3,19 @@ import datetime
 from models.borrow import Borrow
 from errors import InternalServerError
 from services.book_service import increment_copy_count, decrement_copy_count
+from services.user_service import get_user
 
 
-def map_borrow_data_with_borrow_model(isbn, user=None,
-                                      status=None, borrow_date=None, return_date=None):
+def map_borrow_data_with_borrow_model(book, user="",
+                                      status="", borrow_date="", return_date=None):
     # we can create meta pojo class for borrow model to get data
     borrow_model = dict()
-    borrow_model['isbn'] = isbn
+    borrow_model['book'] = book
     borrow_model['user'] = user
     borrow_model['status'] = status
     borrow_model['borrow_date'] = borrow_date if borrow_date else datetime.datetime.now()
-    borrow_model['return_date'] = return_date
+    borrow_model['return_date'] = return_date if return_date else \
+        borrow_model['borrow_date'] + datetime.timedelta(days=30)
     return borrow_model
 
 
@@ -58,31 +60,47 @@ def clean_all_entries(entries):
     return [clean_borrow_entry(entry) for entry in entries]
 
 
-def borrow_book_copy(isbn, user):
+def borrow_book_copy(book, user):
     # create new entry in borrow collection
-    borrow_model_data = map_borrow_data_with_borrow_model(isbn, user=user)
+    borrow_model_data = map_borrow_data_with_borrow_model(book=book, user=user, status="B")
     try:
-        add_entry(borrow_model_data)
+        decrement_copy_count(book)
     except Exception:
         raise InternalServerError("unable to update the entry")
     else:
-        decrement_copy_count(isbn)
+        return add_entry(borrow_model_data)
 
 
-def get_entry_id_from_isbn_snd_user(isbn, user):
-    entries = Borrow.objects.get(isbn=isbn, user=user)
+def get_entry_id_from_book_snd_user(book, user):
+    entries = Borrow.objects(book=book, user=user, status="B")
     valid_entry = entries[0]
     # To-Do Validate entry to update
     return valid_entry
 
 
-def remove_book_copy(isbn, user):
+def remove_book_copy(book, user):
     # update entry in borrow collection
-    borrow_model_data = map_borrow_data_with_borrow_model(isbn, user=user, return_date=datetime.datetime.now())
-    entry_to_update = get_entry_id_from_isbn_snd_user(borrow_model_data['isbn'], borrow_model_data['user'])
+    today = datetime.datetime.now()
+    entry_to_update = get_entry_id_from_book_snd_user(book, user)
     try:
-        entry_to_update.update(**borrow_model_data)
+        increment_copy_count(book)
     except Exception:
         raise InternalServerError("unable to update the entry")
     else:
-        increment_copy_count(isbn)
+        borrow_model_data = map_borrow_data_with_borrow_model(book=book, user=user,
+                                                              borrow_date=entry_to_update.borrow_date, status="R", return_date=today)
+        entry_to_update.update(**borrow_model_data)
+
+
+def book_borrowed_by_user(user_id):
+    user = get_user(user_id)
+    borrowed_entries = Borrow.objects(user=user, status="B")
+    borrowed_books = list()
+    for entry in borrowed_entries:
+        borrowed_book = dict()
+        borrowed_book["book_id"] = str(entry.book.id)
+        borrowed_book["title"] = entry.book.title
+        borrowed_book["borrow_date"] = datetime.datetime.strftime(entry.borrow_date, "%d/%m/%Y")
+        borrowed_book["return_date"] = datetime.datetime.strftime(entry.return_date, "%d/%m/%Y")
+        borrowed_books.append(borrowed_book)
+    return borrowed_books

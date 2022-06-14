@@ -30,9 +30,9 @@ class BooksApi(Resource):
             book_data['description'] = body['description']
             book_data['genre'] = body['genre']
             book_data['author'] = body['author']
-            book_data['total_count'] = body['total_count']
-            book_data['available_count'] = body['available_count']
-            book_data['year_published'] = datetime.datetime.strptime(body['year_published'], "%d/%m/%Y  %H:%M:%S")
+            book_data['total_count'] = body['totalCount']
+            book_data['available_count'] = body['availableCount']
+            book_data['year_published'] = datetime.datetime.strptime(body['yearPublished'], "%d/%m/%Y")
             obj_id = add_book(book_data)
             return {'success': f"Created book with id {obj_id}"}, 200
         except (FieldDoesNotExist, ValidationError):
@@ -47,7 +47,7 @@ class BookApi(Resource):
 
     @jwt_required()
     @roles_required('admin', 'editor')
-    def put(self, obj_id):
+    def put(self, id):
         try:
             body = request.get_json()
             book_data = dict()
@@ -56,10 +56,10 @@ class BookApi(Resource):
             book_data['description'] = body['description']
             book_data['genre'] = body['genre']
             book_data['author'] = body['author']
-            book_data['total_count'] = body['total_count']
-            book_data['available_count'] = body['available_count']
-            book_data['year_published'] = datetime.datetime.strptime(body['year_published'], "%d/%m/%Y  %H:%M:%S")
-            updated_book = update_book(obj_id, book_data)
+            book_data['total_count'] = body['totalCount']
+            book_data['available_count'] = body['availableCount']
+            book_data['year_published'] = datetime.datetime.strptime(body['yearPublished'], "%d/%m/%Y")
+            updated_book = update_book(id, book_data)
             updated_data = clean_book(updated_book)
             return Response(json.dumps(updated_data), mimetype="application/json", status=200)
         except InvalidQueryError:
@@ -71,9 +71,9 @@ class BookApi(Resource):
 
     @jwt_required()
     @roles_required('admin', 'editor')
-    def delete(self, obj_id):
+    def delete(self, id):
         try:
-            delete_book(obj_id)
+            delete_book(id)
             return 'success', 200
         except DoesNotExist:
             raise BookNotExistsError
@@ -81,9 +81,9 @@ class BookApi(Resource):
             raise DeletingBookError
 
     @staticmethod
-    def get(obj_id):
+    def get(id):
         try:
-            book = clean_book(get_book(obj_id))
+            book = clean_book(get_book(id))
             return Response(json.dumps(book), mimetype="application/json", status=200)
         except DoesNotExist:
             raise BookNotExistsError

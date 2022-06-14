@@ -5,3 +5,4 @@ Pipfile.lock
 .env
 .env.test
 .idea/
+mongodata-data/

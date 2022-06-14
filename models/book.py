@@ -2,6 +2,7 @@ from db import db
 
 
 class Book(db.Document):
+
     isbn = db.StringField(required=True, unique=True)
     title = db.StringField(required=True)
     description = db.StringField(required=True)

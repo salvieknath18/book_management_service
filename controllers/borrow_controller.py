@@ -1,7 +1,8 @@
 from flask import request, Response
 from services.borrow_service import delete_entry, get_entry, get_all_entries, clean_all_entries, clean_borrow_entry
-from services.borrow_service import borrow_book_copy, remove_book_copy
+from services.borrow_service import borrow_book_copy, remove_book_copy, book_borrowed_by_user
 from services.user_service import get_current_user, get_user
+from services.book_service import clean_all_books, get_book
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import DoesNotExist
@@ -48,10 +49,10 @@ class BorrowBook(Resource):
     @jwt_required()
     def post(self):
         body = request.get_json()
-        isbn = body['isbn']
-        user = get_current_user
-        borrow_entry = clean_borrow_entry(borrow_book_copy(isbn, user))
-        return Response(json.dumps(borrow_entry), mimetype="application/json", status=200)
+        book = get_book(body['id'])
+        user = get_current_user()
+        borrow_book_copy(book, user)
+        return Response("Success", mimetype="application/json", status=200)
 
 
 class AssignBookByAdmin(Resource):
@@ -60,10 +61,10 @@ class AssignBookByAdmin(Resource):
     @roles_required('admin', 'editor')
     def post(self):
         body = request.get_json()
-        isbn = body['isbn']
+        book = get_book(body['id'])
         user = get_user(body['member_id'])
-        borrow_entry = clean_borrow_entry(borrow_book_copy(isbn, user))
-        return Response(json.dumps(borrow_entry), mimetype="application/json", status=200)
+        borrow_book_copy(book, user)
+        return Response("success", mimetype="application/json", status=200)
 
 
 class ReturnBook(Resource):
@@ -71,10 +72,10 @@ class ReturnBook(Resource):
     @jwt_required()
     def post(self):
         body = request.get_json()
-        isbn = body['isbn']
+        book = get_book(body['id'])
         user = get_current_user()
-        borrow_entry = clean_borrow_entry(remove_book_copy(isbn, user))
-        return Response(json.dumps(borrow_entry), mimetype="application/json", status=200)
+        remove_book_copy(book, user)
+        return Response("success", mimetype="application/json", status=200)
 
 
 class CollectBookByAdmin(Resource):
@@ -83,7 +84,19 @@ class CollectBookByAdmin(Resource):
     @roles_required('admin', 'editor')
     def post(self):
         body = request.get_json()
-        isbn = body['isbn']
+        book = get_book(body['id'])
         user = get_user(body['member_id'])
-        borrow_entry = clean_borrow_entry(remove_book_copy(isbn, user))
-        return Response(json.dumps(borrow_entry), mimetype="application/json", status=200)
+        remove_book_copy(book, user)
+        return Response("success", mimetype="application/json", status=200)
+
+
+class BorrowedBooksByUser(Resource):
+
+    def get(self, id):
+        try:
+            borrowed_details = book_borrowed_by_user(id)
+            return Response(json.dumps(borrowed_details), mimetype="application/json", status=200)
+        except DoesNotExist:
+            raise BookNotExistsError
+        except Exception:
+            raise InternalServerError

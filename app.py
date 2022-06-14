@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from db import initialize_db
 from api import initialize_api
@@ -9,4 +10,4 @@ initialize_db(app)
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
