@@ -90,3 +90,15 @@ def decrement_copy_count(book):
     else:
         update_available_copy_count(book, available_count-1)
 
+
+def sort_by_genre():
+    books = get_all_books()
+    genre_counter = dict()
+    for book in books:
+        genre = book.genre
+        if genre in genre_counter:
+            genre_counter[genre] += 1
+        else:
+            genre_counter[genre] = 1
+    return [{"x": key, "y": value} for key, value in genre_counter.items()]
+
