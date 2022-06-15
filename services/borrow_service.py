@@ -103,4 +103,5 @@ def book_borrowed_by_user(user_id):
         borrowed_book["borrow_date"] = datetime.datetime.strftime(entry.borrow_date, "%d/%m/%Y")
         borrowed_book["return_date"] = datetime.datetime.strftime(entry.return_date, "%d/%m/%Y")
         borrowed_books.append(borrowed_book)
+
     return borrowed_books
