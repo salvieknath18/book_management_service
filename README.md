@@ -10,22 +10,22 @@ This is simplest way to setup environment on local
    - Download Docker and start docker engine
    - Clone the code from repository to local
    - Open CMD go to root directory of project
-   - Run command docker-compose up
+   - Run command `docker-compose up`
    - It will up service for backend on port 5000 (http://localhost:5000
 
 ### Using Local Python Setup
    - download python with version 3.7 or greater
    - clone the project on local repository
    - create file .env on root location (ref .env template))
-   - setup environment variable "ENV_FILE_LOCATION=./.env"
+   - setup environment variable `ENV_FILE_LOCATION=./.env`
    - in file .env we can give the required configurations for db setup"
-   - run command "pip install -r requirement.txt" on root directory to install dependencies
-   - run command "python app.py"
+   - run command `pip install -r requirement.txt` on root directory to install dependencies
+   - run command `python app.py`
    - application will start on port 5000(http://localhost:5000)
 
 ### To run tests
    - create file .env.test on root location (ref .env template))
-   - setup environment variable "ENV_FILE_LOCATION=./.env.test"
+   - setup environment variable `ENV_FILE_LOCATION=./.env.test`
    - run command "unittest book_management_service/tests"
    - test case will run and show success and failure tests
 
