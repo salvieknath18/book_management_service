@@ -101,4 +101,3 @@ def sort_by_genre():
         else:
             genre_counter[genre] = 1
     return [{"x": key, "y": value} for key, value in genre_counter.items()]
-

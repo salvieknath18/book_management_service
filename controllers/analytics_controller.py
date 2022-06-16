@@ -6,8 +6,8 @@ import json
 
 
 class BooksGenre(Resource):
-
-    def get(self):
+    @staticmethod
+    def get():
         books_data = sort_by_genre()
         return Response(json.dumps(books_data), mimetype="application/json", status=200)
 
