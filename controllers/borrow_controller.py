@@ -61,8 +61,8 @@ class AssignBookByAdmin(Resource):
     @roles_required('admin', 'editor')
     def post(self):
         body = request.get_json()
-        book = get_book(body['id'])
-        user = get_user(body['member_id'])
+        book = get_book(body['book_id'])
+        user = get_user(body['user_id'])
         borrow_book_copy(book, user)
         return Response("success", mimetype="application/json", status=200)
 
@@ -84,8 +84,8 @@ class CollectBookByAdmin(Resource):
     @roles_required('admin', 'editor')
     def post(self):
         body = request.get_json()
-        book = get_book(body['id'])
-        user = get_user(body['member_id'])
+        book = get_book(body['book_id'])
+        user = get_user(body['user_id'])
         remove_book_copy(book, user)
         return Response("success", mimetype="application/json", status=200)
 

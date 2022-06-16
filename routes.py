@@ -1,7 +1,8 @@
 from controllers.book_controller import BooksApi, BookApi
 from controllers.user_controller import UsersApi, UserApi
 from controllers.auth_controller import RegisterApi, LoginApi
-from controllers.borrow_controller import BorrowBook, ReturnBook, BorrowEntries, AssignBookByAdmin, BorrowedBooksByUser
+from controllers.borrow_controller import BorrowBook, ReturnBook, BorrowEntries, AssignBookByAdmin, \
+    BorrowedBooksByUser, CollectBookByAdmin
 from controllers.analytics_controller import BooksGenre
 
 
@@ -20,8 +21,9 @@ def initialize_routes(api):
 
     # Borrow Book
     api.add_resource(BorrowBook, '/api/borrowBook')
-    api.add_resource(AssignBookByAdmin, '/api/assignBook')
+    api.add_resource(AssignBookByAdmin, '/api/assignBookByAdmin')
     api.add_resource(ReturnBook, '/api/returnBook')
+    api.add_resource(CollectBookByAdmin, '/api/collectBookByAdmin')
 
     # Analytics (we can add more analytics api as per requirements
     api.add_resource(BooksGenre, '/api/analytics/booksByGenre')
