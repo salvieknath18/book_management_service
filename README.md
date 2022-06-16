@@ -3,8 +3,11 @@
 This is service for book management system. creating CRUD APIs for Books and User.
 
 
-Project Structure
-Project is structure in to following Layers:
+### Project Structure
+Project structure diagram 
+![Project structure diagram](https://github.com/salvieknath18/book_management_service/blob/main/BookManagementService.png?raw=true)
+
+#### Project is structured in to following Layers:
 1. Application : Starting point of project, all configurations, initialization and setups are done here
 2. Router : Here End points are mentioned, For which client request which logic is to implement is the main purpose of the router.
 3. Controllers:
@@ -25,5 +28,3 @@ Project is structure in to following Layers:
    2. Book : Maintain Book data
    3. Borrow : Maintain Borrow and Return entries.
 
-Project structure diagram 
-![Project structure diagram](https://github.com/salvieknath18/book_management_service/blob/main/BookManagementService.png?raw=true)
