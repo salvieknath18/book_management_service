@@ -4,6 +4,7 @@ from controllers.auth_controller import RegisterApi, LoginApi
 from controllers.borrow_controller import BorrowBook, ReturnBook, BorrowEntries, AssignBookByAdmin, \
     BorrowedBooksByUser, CollectBookByAdmin
 from controllers.analytics_controller import BooksGenre
+from services.load_dummy_data import LoadDummyData
 
 
 def initialize_routes(api):
@@ -29,3 +30,6 @@ def initialize_routes(api):
     api.add_resource(BooksGenre, '/api/analytics/booksByGenre')
     api.add_resource(BorrowEntries, '/api/analytics/borrowEntries')
     api.add_resource(BorrowedBooksByUser, '/api/analytics/borrowedBooks/<id>')
+
+    # Created API to load dummydata for demo.
+    api.add_resource(LoadDummyData, '/loadData')

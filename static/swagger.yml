@@ -52,36 +52,32 @@ paths:
         '200':
           description: 'successful operation'
           schema:
-            $ref: '#/definitions/LoginResponse'
+            $ref: '#/components/schemas/LoginResponse'
   /api/auth/register:
     post:
       tags:
         - 'auth'
       summary: 'Register API'
+      operationId: register
       produces:
         - 'application/json'
       requestBody:
+        description: User object that needs to be store
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - isbn
-              properties:
-                artist_name:
-                  type: string
-                artist_genre:
-                  type: string
-                albums_recorded:
-                  type: integer
-                username:
-                  type: string
+              $ref: "#/components/schemas/UserRequest"
       responses:
         '200':
           description: 'successful operation'
           schema:
-            $ref: '#/definitions/LoginResponse'
+            type: 'object'
+            properties:
+              'success' : "string"
+        '405':
+          description: 'Invalid Input'
+          content: {}
   /api/books:
     get:
       tags:
@@ -93,19 +89,32 @@ paths:
         '200':
           description: 'successful operation'
           schema:
-            $ref: '#/definitions/LoginResponse'
+            type: array
+            items:
+              $ref: '#/components/schemas/book'
     post:
       tags:
         - 'books'
       summary: 'Add Book in DB'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
+      requestBody:
+        description: 'Book object that needs to be store'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
       responses:
         '200':
           description: 'successful operation'
           schema:
-            $ref: '#/definitions/LoginResponse'
-  /api/book/<id>:
+            type: 'object'
+            properties:
+              'success': "string"
+  /api/book/{id}:
     get:
       tags:
         - 'books'
@@ -113,42 +122,42 @@ paths:
       produces:
         - 'application/json'
       parameters:
-        - id: limit
-          in: query
+        - name: id
+          in: path
           description: book object id
           schema:
             type: string
       responses:
         '200':
           description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
     delete:
       tags:
         - 'books'
       summary: 'Delete single book'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
       parameters:
-        - id: limit
-          in: query
+        - name: id
+          in: path
           description: book object id
           schema:
             type: string
       responses:
         '200':
           description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
     put:
       tags:
         - 'books'
       summary: 'Add Book in DB'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
       parameters:
-        - id: limit
-          in: query
+        - name: id
+          in: path
           description: book object id
           schema:
             type: string
@@ -157,23 +166,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - isbn
-              properties:
-                artist_name:
-                  type: string
-                artist_genre:
-                  type: string
-                albums_recorded:
-                  type: integer
-                username:
-                  type: string
+              $ref: "#/components/schemas/Book"
       responses:
         '200':
           description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
   /api/users:
     get:
       tags:
@@ -185,65 +181,104 @@ paths:
         '200':
           description: 'successful operation'
           schema:
-            $ref: '#/definitions/LoginResponse'
+            type: array
+            items:
+              $ref: '#/components/schemas/user'
+      security:
+        - bearerAuth: [ ]
     post:
       tags:
         - 'users'
       summary: 'Add User in DB'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
+      requestBody:
+        description: User object that needs to be store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRequest"
       responses:
         '200':
           description: 'successful operation'
           schema:
-            $ref: '#/definitions/LoginResponse'
-  /api/user/<id>:
+            type: 'object'
+            properties:
+              'success' : "string"
+        '405':
+          description: 'Invalid Input'
+          content: {}
+  /api/user/{id}:
     get:
       tags:
         - 'users'
       summary: 'Get single user'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
       parameters:
-        - id: limit
-          in: query
+        - name: id
+          in: path
           description: user object id
           schema:
             type: string
       responses:
         '200':
           description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
     delete:
       tags:
         - 'users'
       summary: 'Delete single user'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
       parameters:
-        - id: limit
-          in: query
+        - name: id
+          in: path
           description: user object id
           schema:
             type: string
       responses:
         '200':
           description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
     put:
       tags:
         - 'users'
       summary: 'Add User in DB'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
       parameters:
-        - id: limit
-          in: query
+        - name: id
+          in: path
           description: user object id
           schema:
             type: string
+      requestBody:
+        description: User object that needs to be store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRequest"
+      responses:
+        '200':
+          description: 'successful operation'
+  /api/borrowBook:
+    post:
+      tags:
+        - 'borrow'
+      summary: 'Borrow Book'
+      security:
+        - bearerAuth: [ ]
+      produces:
+        - 'application/json'
       requestBody:
         required: true
         content:
@@ -251,58 +286,106 @@ paths:
             schema:
               type: object
               required:
-                - isbn
+                - book_id
               properties:
-                artist_name:
-                  type: string
-                artist_genre:
-                  type: string
-                albums_recorded:
-                  type: integer
-                username:
+                book_id:
                   type: string
       responses:
         '200':
           description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
-  /api/borrowBook:
-    post:
-      tags:
-        - 'borrow'
-      summary: 'Add User in DB'
-      produces:
-        - 'application/json'
-      responses:
-        '200':
-          description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
   /api/returnBook:
     post:
       tags:
         - 'borrow'
-      summary: 'Add User in DB'
+      summary: 'Return Book'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - book_id
+              properties:
+                book_id:
+                  type: string
       responses:
         '200':
           description: 'successful operation'
-          schema:
-            $ref: '#/definitions/LoginResponse'
-  /api/analytics/borrowedBooks/<id>:
+  /api/assignBookByAdmin:
+    post:
+      tags:
+        - 'borrow'
+      summary: 'Assign Book by admin'
+      security:
+        - bearerAuth: [ ]
+      produces:
+        - 'application/json'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - book_id
+                - user_id
+              properties:
+                book_id:
+                  type: string
+                user_id:
+                  type: string
+      responses:
+        '200':
+          description: 'successful operation'
+  /api/collectBookByAdmin:
+    post:
+      tags:
+        - 'borrow'
+      summary: 'Collect book by admin'
+      security:
+        - bearerAuth: [ ]
+      produces:
+        - 'application/json'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - book_id
+                - user_id
+              properties:
+                book_id:
+                  type: string
+                user_id:
+                  type: string
+    responses:
+      '200':
+        description: 'successful operation'
+  /api/analytics/borrowedBooks/{id}:
     get:
       tags:
         - 'analytics'
       summary: 'Get single user'
+      security:
+        - bearerAuth: [ ]
       produces:
         - 'application/json'
       parameters:
-        - id: limit
-          in: query
+        - name: id
+          in: path
           description: user object id
           schema:
             type: string
+      responses:
+        '200':
+          description: 'successful operation'
   /api/analytics/booksByGenre:
     get:
       tags:
@@ -310,30 +393,87 @@ paths:
       summary: 'Get single user'
       produces:
         - 'application/json'
-      parameters:
-        - id: limit
-          in: query
-          description: user object id
-          schema:
-            type: string
-definitions:
-  LoginRequest:
-    type: 'object'
-    properties:
-      username:
-        type: 'string'
-      password:
-        type: 'string'
-  LoginResponse:
-    type: 'object'
-    properties:
-      id:
-        type: 'id'
-      name:
-        type: 'string'
-      email:
-        type: 'string'
-      role:
-        type: 'string'
-      token:
-        type: 'string'
+      responses:
+        '200':
+          description: 'successful operation'
+components:
+  schemas:
+    LoginRequest:
+      type: 'object'
+      properties:
+        username:
+          type: 'string'
+        password:
+          type: 'string'
+    LoginResponse:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        role:
+          type: 'string'
+        token:
+          type: 'string'
+    UserRequest:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        password:
+          type: 'string'
+        role:
+          type: 'string'
+    UserResponse:
+      type: 'object'
+      properties:
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        password:
+          type: 'string'
+        role:
+          type: 'string'
+    User:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        role:
+          type: 'string'
+    Book:
+      type: 'object'
+      properties:
+        isbn:
+          type: 'string'
+        title:
+          type: 'string'
+        description:
+          type: 'string'
+        genre:
+          type: 'string'
+        author:
+          type: 'string'
+        year_published:
+          type: 'string'
+        total_count:
+          type: 'string'
+        available_count:
+          type: 'string'
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

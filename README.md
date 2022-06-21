@@ -25,6 +25,8 @@ This is the most basic method for creating a local environment.
 * run command: "python app.py"
 * The application will start on port 5000 (http://localhost:5000).
 
+Note: Added one additional end point (http://localhost:5000/loadData) to load dummy data.
+
 ### To carry out tests
 * make a file.env.test in the root directory (ref.env template))
 * environment variable configuration"ENV_FILE_LOCATION=./.env.test"
@@ -35,7 +37,7 @@ This is the most basic method for creating a local environment.
 While developing the assignment, I made a few assumptions.
 * ISBN number is the International Standard Book Number, which is a numeric commercial book identifier that is intended to be unique. so, I used that as a unique constraint for book model.
 * As admin can only create users, there is no signup page in the front end, so the first admin user has to be created manually using the register API.
-
+* Added one additional end point (http://localhost:5000/loadData) to load dummy data.
 ### Project Structure
 Project structure diagram 
 
